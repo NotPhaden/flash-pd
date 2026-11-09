@@ -1,38 +1,35 @@
-# FLASH Management System – Member/Profile & Operations Update
+# FLASH Police Department Panel
 
-## Included updates
+Proiect Next.js existent, cu interfața și funcționalitățile originale păstrate. Modificările acestei livrări se concentrează pe sincronizarea Supabase/Auth/Realtime și pe o procedură de migrare nedistructivă.
 
-- Member profile: real CNP fallback from RP account, call sign and badge details, profile avatar and cover/background uploads.
-- Departments: Conducere headcount is calculated from rank level 8 (Subcomisar) and above; multiple department memberships are supported through `officer_departments`.
-- Notifications: bell indicator, in-app toast and alert sound; polling fallback refreshes notifications even if Realtime publication is not enabled.
-- Leave requests: only `Concediu` and `Învoire ședință`; own submissions and leadership approval/rejection.
-- Actions: participants are listed, participation cannot be withdrawn, creator can cancel their own open action.
-- Profile weekly activity is calculated from actual attendance hours.
-- Audit journal is shown only to Subcomisar+ and command roles.
-- Sanctions: insert RLS for Subcomisar+ and delete only for `super_admin` / `commander`.
-- Radio codes and processing templates: rank-based write policies.
-- Equipment and vehicles: real CRUD lists using the existing `equipment` and `vehicles` tables, linked to members in the personnel register.
-- Removed public-facing Supabase connection/settings text from the interface.
+## Instalare locală
 
-## Supabase migration order
+1. Instalează Node.js 20+.
+2. Rulează `npm ci`.
+3. Copiază `.env.example` în `.env.local`.
+4. Completează `NEXT_PUBLIC_SUPABASE_URL` și `NEXT_PUBLIC_SUPABASE_ANON_KEY` cu valorile proiectului Supabase.
+5. Rulează `npm run dev`.
 
-Only run `schema.sql` for a new/empty project. For an existing project, do not rerun the fresh schema.
+Pentru verificare: `npx tsc --noEmit`. Pentru build: `npm run build`.
 
-For an existing FLASH installation, apply any earlier migrations that have not yet been applied, in this order:
+## Supabase
 
-1. `rp_accounts_migration.sql`
-2. `flash_corrective_migration.sql`
-3. `flash_functional_fixes.sql`
-4. `sas_dcco_units_migration.sql`
-5. `flash_profile_actions_migration.sql`
-6. `flash_member_profile_inventory_fix.sql`
+Citește obligatoriu:
+- `PROJECT_AUDIT_RO.md` – inventarul și constatările auditului.
+- `supabase/README-MIGRATIONS-RO.md` – backup, ordinea migrărilor și verificări.
 
-The two previously supplied migrations `flash_corrective_migration.sql` and `flash_profile_actions_migration.sql` have been corrected to avoid the malformed `DO $$` terminators that caused SQL syntax errors. Do not rerun migrations already applied unless you have a database backup and understand their effects.
+**Nu rula `supabase/schema.sql` peste o bază de date existentă.** Pentru o bază existentă, identifică întâi migrările aplicate, fă backup complet și aplică numai schimbările lipsă. Apoi rulează `00_backup_existing_data.sql` și `01_canonical_rank_realtime_repair.sql` conform instrucțiunilor.
 
-## Notes
+## Grad și rol
 
-- `flash_member_profile_inventory_fix.sql` creates the multiple-department relation, storage bucket/policies, rank-based RLS, profile appearance RPC, and audit triggers.
-- Profile uploads use the Supabase Storage bucket named `avatars` and a user-specific folder.
-- The interface no longer exposes database-provider configuration details. Keep environment variables and keys in deployment configuration; never put a `service_role` key in browser code.
-- `tsc --noEmit` passes. A production Next.js build could not complete in this environment because the Linux SWC binary was unavailable and network access to the package registry failed.
-- Supabase migrations have not been run against the live project from this workspace.
+`officers.rank_id` → `ranks.id` este sursa unică a gradului curent. `user_roles.role` rămâne sursa rolurilor de autorizare. `officer_promotions` păstrează istoricul; `officer_ranks` este păstrat pentru compatibilitate și nu este folosit ca grad curent de interfață.
+
+## Securitate
+
+Nu distribui `.env`, cheia `service_role`, token-uri sau date reale. Arhiva livrată exclude `.env`, `.git`, `.next` și `node_modules`; dependențele se reinstalează prin `npm ci`.
+
+## Starea testelor acestei livrări
+
+- TypeScript `tsc --noEmit`: PASS.
+- Build Next.js: nefinalizat deoarece pachetul SWC nativ nu a putut fi descărcat în mediul fără acces la registry.
+- SQL și integrarea Supabase live: neexecutate; necesită un proiect Supabase staging și credențiale de test.

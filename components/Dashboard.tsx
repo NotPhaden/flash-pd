@@ -121,10 +121,45 @@ export default function Dashboard() {
         setTimeout(async () => { const {data}=await client.from("user_roles").select("role").eq("user_id", session.user.id).maybeSingle(); const resolved=await resolveUnitRole(session.user.id,data?.role||"visitor"); setRole(resolved); const {data:rankRow}:any=await client.from("officers").select("avatar_url,ranks(name,level)").eq("user_id",session.user.id).maybeSingle(); setUserRank(rankRow?.ranks?.name||"Grad neatribuit");setUserRankLevel(Number(rankRow?.ranks?.level||0));setSidebarAvatar(rankRow?.avatar_url||""); }, 0);
       }
     });
+    const refreshCurrentAccount = async (uid:string) => {
+      const {data:rr}=await client.from("user_roles").select("role").eq("user_id",uid).maybeSingle();
+      const resolved=await resolveUnitRole(uid,rr?.role||"visitor");
+      const {data:rankRow}:any=await client.from("officers").select("avatar_url,ranks(name,level)").eq("user_id",uid).maybeSingle();
+      setRole(resolved);
+      setUserRank(rankRow?.ranks?.name||"Grad neatribuit");
+      setUserRankLevel(Number(rankRow?.ranks?.level||0));
+      setSidebarAvatar(rankRow?.avatar_url||"");
+      if(resolved==="visitor" || String(rankRow?.ranks?.name||"").toLowerCase()==="academie")setSection("Academie");
+    };
     const channel = client.channel("officer-changes").on("postgres_changes",
-      { event: "*", schema: "public", table: "officers" }, async (payload:any) => { loadOfficers(); const {data:sessionData}=await client.auth.getSession(); const uid=sessionData.session?.user.id; if(uid && (payload.new?.user_id===uid || payload.old?.user_id===uid)){ const {data:rr}=await client.from("user_roles").select("role").eq("user_id",uid).maybeSingle(); const resolved=await resolveUnitRole(uid,rr?.role||"visitor"); setRole(resolved); const {data:rankRow}:any=await client.from("officers").select("avatar_url,ranks(name,level)").eq("user_id",uid).maybeSingle(); setUserRank(rankRow?.ranks?.name||"Grad neatribuit");setUserRankLevel(Number(rankRow?.ranks?.level||0));setSidebarAvatar(rankRow?.avatar_url||""); if(resolved==="visitor" || String(rankRow?.ranks?.name||"").toLowerCase()==="academie")setSection("Academie"); }}).subscribe();
+      { event: "*", schema: "public", table: "officers" }, async (payload:any) => {
+        loadOfficers();
+        const {data:sessionData}=await client.auth.getSession();
+        const uid=sessionData.session?.user.id;
+        if(uid && (payload.new?.user_id===uid || payload.old?.user_id===uid)) await refreshCurrentAccount(uid);
+      }).subscribe();
+    // A rank's label/level can change without touching officers.rank_id. Subscribe to
+    // the referenced table as well so the dashboard never keeps a stale joined rank.
+    const rankChannel = client.channel("rank-catalog-changes").on("postgres_changes",
+      { event: "*", schema: "public", table: "ranks" }, async () => {
+        loadOfficers();
+        const {data:sessionData}=await client.auth.getSession();
+        const uid=sessionData.session?.user.id;
+        if(uid) await refreshCurrentAccount(uid);
+      }).subscribe();
+    const roleChannel = client.channel("user-role-changes").on("postgres_changes",
+      { event: "*", schema: "public", table: "user_roles" }, async (payload:any) => {
+        const {data:sessionData}=await client.auth.getSession();
+        const uid=sessionData.session?.user.id;
+        if(uid && (payload.new?.user_id===uid || payload.old?.user_id===uid)) await refreshCurrentAccount(uid);
+      }).subscribe();
     loadOfficers();
-    return () => { client.removeChannel(channel); authSub.data.subscription.unsubscribe(); };
+    return () => {
+      client.removeChannel(channel);
+      client.removeChannel(rankChannel);
+      client.removeChannel(roleChannel);
+      authSub.data.subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -325,20 +360,19 @@ function Personnel({ officers, search, setSearch, onAdd, role, rankLevel, onRefr
   async function saveEdit(e:React.FormEvent){
     e.preventDefault();
     if(!supabase||!editing||!canEdit)return;
-    const {error}=await supabase.rpc("update_officer_record",{
+    const {error}=await supabase.rpc("save_officer_record_with_career",{
       p_officer_id:editing.id,
       p_full_name:draft.full_name.trim(),
       p_cnp:draft.cnp.trim()||null,
       p_call_sign:draft.call_sign.trim()||null,
       p_badge_number:draft.badge_number.trim()||null,
       p_status:draft.status,
+      p_joined_at:draft.joined_at||null,
       p_update_assignments:canAssignRank,
       p_rank_id:canAssignRank?(draft.rank_id||null):null,
       p_department_ids:canAssignRank?(draft.department_ids||[]):[]
     });
     if(error){alert("Nu s-au putut salva datele membrului: "+error.message);return;}
-    const {error:careerError}=await supabase.rpc("manage_officer_career",{p_officer_id:editing.id,p_joined_at:draft.joined_at||null,p_rank_id:canAssignRank?(draft.rank_id||null):null,p_change:null});
-    if(careerError){alert("Datele principale au fost salvate, dar data intrării nu a putut fi actualizată: "+careerError.message);return;}
     if(canAssignRank){
       for(const cert of ["Radio","MDT","Heli","Moto","HS"]){
         if(certificates.includes(cert)) { const {error:e}=await supabase.from("officer_certificates").upsert({officer_id:editing.id,certificate:cert},{onConflict:"officer_id,certificate"}); if(e){alert("Eroare la acordarea certificatului "+cert+": "+e.message);return;} }
