@@ -50,3 +50,20 @@ tr:hover td { background:#ffffff05; }
   .panel:hover { transform: none; }
   .btn, .field, .pill { transition: none !important; }
 }
+
+/* Refined motion pass: more intentional navigation feedback without heavy effects. */
+@keyframes flashSectionReveal {
+  0% { opacity: 0; transform: translate3d(0, 14px, 0) scale(.985); filter: blur(2px); }
+  65% { opacity: 1; transform: translate3d(0, -2px, 0) scale(1); filter: blur(0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0); }
+}
+aside nav button { position: relative; overflow: hidden; transition: background-color .22s ease, color .22s ease, transform .22s cubic-bezier(.2,.8,.2,1); }
+aside nav button:hover { transform: translateX(3px); }
+aside nav button:active { transform: translateX(1px) scale(.985); }
+main > header { transition: border-color .25s ease, background-color .25s ease; }
+.panel { animation: flashSectionReveal .42s cubic-bezier(.2,.75,.25,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  aside nav button, main > header { transition: none !important; }
+  aside nav button:hover, aside nav button:active { transform: none !important; }
+  .panel { animation: none !important; }
+}
