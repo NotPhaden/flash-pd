@@ -2,15 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  Activity, BadgeCheck, BarChart3, Bell, BookOpen, Car, ChevronDown, ClipboardList,
+  Activity, BadgeCheck, BarChart3, Bell, BookOpen, Car, ChevronDown, ClipboardList, Image as ImageIcon,
   FileText, LayoutDashboard, LogOut, Menu, Search, Settings, Shield, ShieldCheck,
   Siren, Users, UserRound, X, Plus, Clock3, Award, BriefcaseBusiness, Radio,
   TrendingUp, Package, ScrollText, CalendarDays, Building2, Gavel, UserPlus
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import FeatureSections from "@/components/FeatureSections";
+import Policegram from "@/components/Policegram";
 
-type Section = "Dashboard" | "Personal" | "Academie" | "Notificări" | "Coduri radio" | "Modele procesări" | "Profil" | "Grade" | "Departamente" | "Logs" | "Pontaj" | "Sancțiuni" | "DCCO" | "SAS" | "Acțiuni" | "Dosare" | "Vehicule" | "Echipamente" | "Recrutări" | "Cereri concediu" | "Certificate" | "Instructori";
+type Section = "Policegram" | "Dashboard" | "Personal" | "Academie" | "Notificări" | "Coduri radio" | "Modele procesări" | "Profil" | "Grade" | "Departamente" | "Logs" | "Pontaj" | "Sancțiuni" | "DCCO" | "SAS" | "Acțiuni" | "Dosare" | "Vehicule" | "Echipamente" | "Recrutări" | "Cereri concediu" | "Certificate" | "Instructori";
 type Officer = { id: string; rank_level?:number; rank_id?:string|null; department_id?:string|null; department_ids?:string[]; full_name: string; badge_number: string | null; rank_name: string; department_name: string; status: string; joined_at?: string; call_sign?: string; cnp?:string|null };
 
 async function authEmailForCharacterId(value:string) {
@@ -24,6 +25,7 @@ function legacyAuthEmailForCharacterId(value:string) {
   return `${value.trim().toLowerCase().replace(/[^a-z0-9._-]/g, "")}@accounts.flash-rp.invalid`;
 }
 const nav: { label: Section; icon: any; group: string }[] = [
+  { label: "Policegram", icon: ImageIcon, group: "PRINCIPAL" },
   { label: "Dashboard", icon: LayoutDashboard, group: "PRINCIPAL" },
   { label: "Personal", icon: Users, group: "PRINCIPAL" },
   { label: "Academie", icon: UserPlus, group: "PRINCIPAL" },
@@ -76,11 +78,11 @@ export default function Dashboard() {
   const [form, setForm] = useState({ full_name: "", badge_number: "", rank_name: "Agent", department_name: "Patrulare", call_sign: "" });
 
   async function resolveUnitRole(uid:string, baseRole:string) {
-    if (!supabase || !["officer","visitor"].includes(baseRole)) return baseRole;
+    if (!supabase || ["super_admin","commander"].includes(baseRole)) return baseRole;
     const {data:o}:any=await supabase.from("officers").select("id,department_id,departments!officers_department_id_fkey(name),ranks!officers_rank_id_fkey(name,level)").eq("user_id",uid).maybeSingle();
-    const {data:rels}=o?.id?await supabase.from("officer_departments").select("departments(name)").eq("officer_id",o.id):{data:[] as any[]};
-    const names=[o?.departments?.name,...(rels||[]).map((x:any)=>x.departments?.name)].filter(Boolean).map((x:string)=>x.toLowerCase().trim());
-    const rankName=String(o?.ranks?.name||"").toLowerCase().trim();
+    const {data:rels}=o?.id?await supabase.from("officer_departments").select("department_id,departments(name)").eq("officer_id",o.id):{data:[] as any[]};
+    const names=[o?.departments?.name,...(rels||[]).map((x:any)=>x.departments?.name)].filter(Boolean).map((x:string)=>x.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim());
+    const rankName=String(o?.ranks?.name||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
     // Gradele de conducere au prioritate: rolul se deduce și din grad, nu doar din user_roles.
     if(rankName.includes("conducere dcco")) return "dcco_conducere";
     if(rankName.includes("conducere sas")) return "sas_conducere";
@@ -281,7 +283,7 @@ export default function Dashboard() {
           {["PRINCIPAL", "ADMINISTRARE", "OPERAȚIONAL", "RESURSE", "SISTEM"].map(group => (
             <div key={group} className="mb-5">
               <div className="label mb-2 px-3">{group}</div>
-              {nav.filter(n => n.group === group && n.label.toLocaleLowerCase("ro-RO").includes(menuSearch.trim().toLocaleLowerCase("ro-RO")) && (role !== "visitor" || ["Academie","Profil","Notificări"].includes(n.label)) && (userRank.toLowerCase() !== "academie" || ["Academie","Profil","Notificări"].includes(n.label)) && (n.label !== "Instructori" || ["instructor_radio","instructor_mdt","instructor_heli","instructor_moto","instructor_hs","super_admin","commander"].includes(role) || userRankLevel >= 8) && (n.label !== "DCCO" || ["super_admin","commander","dcco","dcco_conducere"].includes(role) || userRank.toLowerCase().includes("conducere dcco")) && (n.label !== "SAS" || ["super_admin","commander","sas","sas_conducere"].includes(role) || userRank.toLowerCase().includes("conducere sas")) && (n.label !== "Recrutări" || (userRankLevel >= 8 && userRankLevel <= 13) || ["super_admin","commander"].includes(role)) && (n.label !== "Logs" || (userRankLevel >= 8 && userRankLevel <= 13) || ["super_admin","commander"].includes(role))).map(item => {
+              {nav.filter(n => n.group === group && n.label.toLocaleLowerCase("ro-RO").includes(menuSearch.trim().toLocaleLowerCase("ro-RO")) && (role !== "visitor" || ["Academie","Profil","Notificări","Policegram"].includes(n.label)) && (userRank.toLowerCase() !== "academie" || ["Academie","Profil","Notificări","Policegram"].includes(n.label)) && (n.label !== "Instructori" || ["instructor_radio","instructor_mdt","instructor_heli","instructor_moto","instructor_hs","super_admin","commander"].includes(role) || userRankLevel >= 8) && (n.label !== "DCCO" || ["super_admin","commander","dcco","dcco_conducere"].includes(role) || userRank.toLowerCase().includes("conducere dcco")) && (n.label !== "SAS" || ["super_admin","commander","sas","sas_conducere"].includes(role) || userRank.toLowerCase().includes("conducere sas")) && (n.label !== "Recrutări" || (userRankLevel >= 8 && userRankLevel <= 13) || ["super_admin","commander"].includes(role)) && (n.label !== "Logs" || (userRankLevel >= 8 && userRankLevel <= 13) || ["super_admin","commander"].includes(role))).map(item => {
                 const Icon = item.icon; const selected = section === item.label;
                 return <button key={item.label} onClick={() => { setSection(item.label); setMobileNav(false); }} className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[13px] font-semibold transition ${selected ? "bg-blue-500/15 text-blue-300" : "text-slate-400 hover:bg-white/5 hover:text-slate-100"}`}>
                   <Icon size={16}/>{item.label}{item.label === "Dashboard" && <span className="ml-auto rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-black text-emerald-400">LIVE</span>}
@@ -310,7 +312,7 @@ export default function Dashboard() {
 
         <div className="mx-auto max-w-[1600px] p-4 sm:p-7">
           {notice && <div className="mb-5 flex items-start justify-between gap-3 rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-200"><span>{notice}</span><button onClick={() => setNotice("")}><X size={16}/></button></div>}
-          {(role === "visitor" || userRank.toLowerCase()==="academie") && !["Academie","Profil","Notificări"].includes(section) ? <div className="panel p-6"><h1 className="text-xl font-black">Acces limitat · Vizitator</h1><p className="muted mt-2 text-sm">Contul de vizitator poate consulta doar Academia, profilul și notificările.</p></div> : section === "Dashboard" ? <DashboardHome officers={officers} activeCount={activeCount} departmentCounts={departmentCounts} canViewAudit={userRankLevel>=8||["super_admin","commander"].includes(role)} onNavigate={setSection}/> :
+          {section === "Policegram" ? <Policegram userId={userId} onNotice={setNotice}/> : (role === "visitor" || userRank.toLowerCase()==="academie") && !["Academie","Profil","Notificări","Policegram"].includes(section) ? <div className="panel p-6"><h1 className="text-xl font-black">Acces limitat · Vizitator</h1><p className="muted mt-2 text-sm">Contul de vizitator poate consulta doar Academia, profilul și notificările.</p></div> : section === "Dashboard" ? <DashboardHome officers={officers} activeCount={activeCount} departmentCounts={departmentCounts} canViewAudit={userRankLevel>=8||["super_admin","commander"].includes(role)} onNavigate={setSection}/> :
             section === "Personal" ? <Personnel officers={filtered} search={search} setSearch={setSearch} onAdd={() => setModal(true)} role={role} rankLevel={userRankLevel} onRefresh={loadOfficers} onViewAttendance={(id:string)=>{setAttendanceOfficer(id);setSection("Pontaj");}}/> :
             ["Academie","Certificate","Notificări","Coduri radio","Modele procesări","Profil","Pontaj","Sancțiuni","DCCO","SAS","Acțiuni","Recrutări","Logs","Instructori","Cereri concediu"].includes(section) ? <FeatureSections section={section === "Recrutări" ? "Recrutări" : section} officers={officers} userId={userId} role={role} rankLevel={userRankLevel} initialTarget={attendanceOfficer} onNotice={setNotice} onProfileUpdate={(url:string)=>setSidebarAvatar(url)}/> :
             <GenericSection section={section} officers={officers} onAdd={() => setModal(true)} role={role} rankLevel={userRankLevel}/>}

@@ -59,3 +59,13 @@ Pentru validare live este suficient un acces controlat la un proiect **staging**
 - confirmarea migrărilor deja aplicate.
 
 Nu trimite parola contului personal, cheia `service_role`, token-uri JWT sau date personale reale. Preferă un branch/staging și credențiale temporare cu permisiuni minime.
+
+## Policegram și repararea finală a accesului SAS/DCCO
+
+După migrațiile FLASH deja aplicate, rulează `policegram_and_final_access_fix.sql` în Supabase SQL Editor. Migrarea:
+- repară funcțiile de acces pentru SAS și DCCO pe baza rolului, gradului și tuturor departamentelor asociate;
+- permite conducerii SAS/DCCO să administreze documentele unității proprii și să consulte rosterul corect;
+- creează tabelele Policegram pentru postări, comentarii și aprecieri;
+- creează bucket-ul public `policegram-media` cu upload autentificat și politici RLS.
+
+Policegram este disponibil conturilor autentificate, inclusiv conturilor cu rol Vizitator/Academie. Feed-ul permite imagini și videoclipuri, comentarii, like-uri și un Top 5 după numărul total de aprecieri primite.
