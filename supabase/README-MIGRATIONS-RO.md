@@ -69,3 +69,7 @@ După migrațiile FLASH deja aplicate, rulează `policegram_and_final_access_fix
 - creează bucket-ul public `policegram-media` cu upload autentificat și politici RLS.
 
 Policegram este disponibil conturilor autentificate, inclusiv conturilor cu rol Vizitator/Academie. Feed-ul permite imagini și videoclipuri, comentarii, like-uri și un Top 5 după numărul total de aprecieri primite.
+
+## Corecție finală Conducere SAS/DCCO și moderare Policegram
+
+Rulează `policegram_moderation_and_sas_dcco_departments_fix.sql` după migrațiile Policegram și departamente. Migrarea mută membrii care aveau gradele Conducere SAS/DCCO în departamentele omonime, elimină acele două grade din tabelul de grade, aliniază permisiunile SAS/DCCO la apartenența la departamente și adaugă moderarea Policegram pentru Chestor general și Chestor secundar (ștergere postări și interdicții de publicare).

@@ -25,12 +25,12 @@ function legacyAuthEmailForCharacterId(value:string) {
   return `${value.trim().toLowerCase().replace(/[^a-z0-9._-]/g, "")}@accounts.flash-rp.invalid`;
 }
 const nav: { label: Section; icon: any; group: string }[] = [
-  { label: "Policegram", icon: ImageIcon, group: "PRINCIPAL" },
   { label: "Dashboard", icon: LayoutDashboard, group: "PRINCIPAL" },
   { label: "Personal", icon: Users, group: "PRINCIPAL" },
   { label: "Academie", icon: UserPlus, group: "PRINCIPAL" },
   { label: "Certificate", icon: BadgeCheck, group: "PRINCIPAL" },
   { label: "Notificări", icon: Bell, group: "PRINCIPAL" },
+  { label: "Policegram", icon: ImageIcon, group: "PRINCIPAL" },
   { label: "Coduri radio", icon: Radio, group: "RESURSE" },
   { label: "Modele procesări", icon: ScrollText, group: "RESURSE" },
   { label: "Profil", icon: UserRound, group: "SISTEM" },
@@ -84,8 +84,8 @@ export default function Dashboard() {
     const names=[o?.departments?.name,...(rels||[]).map((x:any)=>x.departments?.name)].filter(Boolean).map((x:string)=>x.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim());
     const rankName=String(o?.ranks?.name||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
     // Gradele de conducere au prioritate: rolul se deduce și din grad, nu doar din user_roles.
-    if(rankName.includes("conducere dcco")) return "dcco_conducere";
-    if(rankName.includes("conducere sas")) return "sas_conducere";
+    if(rankName.includes("conducere dcco") || names.includes("conducere dcco")) return "dcco_conducere";
+    if(rankName.includes("conducere sas") || names.includes("conducere sas")) return "sas_conducere";
     const instructorDepartments:Record<string,string>={radio:"instructor_radio",mdt:"instructor_mdt",final:"instructor_moto",heli:"instructor_heli",hs:"instructor_hs","instructor radio":"instructor_radio","instructor mdt":"instructor_mdt","instructor final":"instructor_moto","instructor heli":"instructor_heli","instructor hs":"instructor_hs"};
     for (const [department, instructorRole] of Object.entries(instructorDepartments)) if (names.includes(department)) return instructorRole;
     if(rankName.includes("instructor radio")) return "instructor_radio";
@@ -312,7 +312,7 @@ export default function Dashboard() {
 
         <div className="mx-auto max-w-[1600px] p-4 sm:p-7">
           {notice && <div className="mb-5 flex items-start justify-between gap-3 rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-200"><span>{notice}</span><button onClick={() => setNotice("")}><X size={16}/></button></div>}
-          {section === "Policegram" ? <Policegram userId={userId} onNotice={setNotice}/> : (role === "visitor" || userRank.toLowerCase()==="academie") && !["Academie","Profil","Notificări","Policegram"].includes(section) ? <div className="panel p-6"><h1 className="text-xl font-black">Acces limitat · Vizitator</h1><p className="muted mt-2 text-sm">Contul de vizitator poate consulta doar Academia, profilul și notificările.</p></div> : section === "Dashboard" ? <DashboardHome officers={officers} activeCount={activeCount} departmentCounts={departmentCounts} canViewAudit={userRankLevel>=8||["super_admin","commander"].includes(role)} onNavigate={setSection}/> :
+          {section === "Policegram" ? <Policegram userId={userId} onNotice={setNotice} role={role} rankLevel={userRankLevel}/> : (role === "visitor" || userRank.toLowerCase()==="academie") && !["Academie","Profil","Notificări","Policegram"].includes(section) ? <div className="panel p-6"><h1 className="text-xl font-black">Acces limitat · Vizitator</h1><p className="muted mt-2 text-sm">Contul de vizitator poate consulta doar Academia, profilul și notificările.</p></div> : section === "Dashboard" ? <DashboardHome officers={officers} activeCount={activeCount} departmentCounts={departmentCounts} canViewAudit={userRankLevel>=8||["super_admin","commander"].includes(role)} onNavigate={setSection}/> :
             section === "Personal" ? <Personnel officers={filtered} search={search} setSearch={setSearch} onAdd={() => setModal(true)} role={role} rankLevel={userRankLevel} onRefresh={loadOfficers} onViewAttendance={(id:string)=>{setAttendanceOfficer(id);setSection("Pontaj");}}/> :
             ["Academie","Certificate","Notificări","Coduri radio","Modele procesări","Profil","Pontaj","Sancțiuni","DCCO","SAS","Acțiuni","Recrutări","Logs","Instructori","Cereri concediu"].includes(section) ? <FeatureSections section={section === "Recrutări" ? "Recrutări" : section} officers={officers} userId={userId} role={role} rankLevel={userRankLevel} initialTarget={attendanceOfficer} onNotice={setNotice} onProfileUpdate={(url:string)=>setSidebarAvatar(url)}/> :
             <GenericSection section={section} officers={officers} onAdd={() => setModal(true)} role={role} rankLevel={userRankLevel}/>}
@@ -357,7 +357,7 @@ function Personnel({ officers, search, setSearch, onAdd, role, rankLevel, onRefr
   const [ranks,setRanks]=useState<any[]>([]),[departments,setDepartments]=useState<any[]>([]),[editing,setEditing]=useState<Officer|null>(null),[draft,setDraft]=useState<any>({}),[certificates,setCertificates]=useState<string[]>([]),[promotionLog,setPromotionLog]=useState<any[]>([]);
   const canEdit=(rankLevel>=8&&rankLevel<=13)||["super_admin","commander"].includes(role);
   const canAssignRank=(rankLevel>=12&&rankLevel<=13)||["super_admin","commander"].includes(role);
-  useEffect(()=>{if(!supabase||!canEdit)return;Promise.all([supabase.from("ranks").select("id,name").order("level"),supabase.from("departments").select("id,name").order("name")]).then(([r,d])=>{setRanks(r.data||[]);setDepartments((d.data||[]).filter((x:any)=>!["intervenții speciale","criminalistică","intervenții criminale","ordine publică","poliția rutieră","poliție rutieră"].includes(String(x.name).toLocaleLowerCase("ro-RO"))));});},[canEdit]);
+  useEffect(()=>{if(!supabase||!canEdit)return;Promise.all([supabase.from("ranks").select("id,name").order("level"),supabase.from("departments").select("id,name").order("name")]).then(([r,d])=>{setRanks((r.data||[]).filter((x:any)=>!/^conducere\s+(sas|dcco)$/i.test(String(x.name||"").trim())));setDepartments((d.data||[]).filter((x:any)=>!["intervenții speciale","criminalistică","intervenții criminale","ordine publică","poliția rutieră","poliție rutieră"].includes(String(x.name).toLocaleLowerCase("ro-RO"))));});},[canEdit]);
   async function openEdit(o:Officer){let ids=o.department_ids||[];if(supabase){const {data}=await supabase.from("officer_departments").select("department_id").eq("officer_id",o.id);if(data?.length)ids=data.map((x:any)=>x.department_id);}setEditing(o);setDraft({full_name:o.full_name,cnp:o.cnp||"",call_sign:o.call_sign||"",rank_id:o.rank_id||"",department_ids:ids,badge_number:o.badge_number||"",status:o.status||"Activ",joined_at:o.joined_at||new Date().toISOString().slice(0,10)});
     if(supabase){const [c,l]=await Promise.all([supabase.from("officer_certificates").select("certificate").eq("officer_id",o.id),supabase.from("officer_promotions").select("id,change_type,old_rank_name,new_rank_name,created_at").eq("officer_id",o.id).order("created_at",{ascending:false})]);setCertificates((c.data||[]).map((x:any)=>x.certificate));setPromotionLog(l.data||[]);}}
   async function saveEdit(e:React.FormEvent){
