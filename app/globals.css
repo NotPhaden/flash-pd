@@ -39,3 +39,14 @@ tr:hover td { background:#ffffff05; }
 .btn:active { transform: scale(.98); }
 .pill-blue { animation: flashGlow 3.8s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+
+/* Subtle interface motion: restrained entrance, hover lift, and staggered dashboard cards. */
+@keyframes flashCardEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.panel { animation: flashCardEnter .28s ease-out both; }
+.panel:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.16); }
+.btn, .field, .pill { transition: color .18s ease, background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .panel { animation: none !important; }
+  .panel:hover { transform: none; }
+  .btn, .field, .pill { transition: none !important; }
+}
