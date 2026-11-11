@@ -1,4 +1,4 @@
-# Raport de audit tehnic – FLASH Police Department Panel
+# Raport de audit tehnic – Kromix Police Department Panel
 
 ## Domeniul inspectat
 - Cod Next.js/React: `app/`, `components/`, `lib/`.
@@ -36,7 +36,7 @@ administrarea carierei, editarea personalului, profil și permisiuni.
    Modificarea numelui/nivelului unui grad în `ranks` nu produce automat UPDATE
    în `officers`, deci join-ul putea rămâne învechit în UI.
 4. **Politicile RLS au evoluat în mai multe fișiere.** Funcțiile precum
-   `is_flash_leadership`, `is_flash_top_command`, `has_role` și procedurile RPC
+   `is_Kromix_leadership`, `is_Kromix_top_command`, `has_role` și procedurile RPC
    trebuie păstrate coerente. Ascunderea elementelor de meniu în frontend nu
    este control de securitate; decizia finală trebuie să rămână în SQL/RLS/RPC.
 5. **Tabele istorice și funcționale.** `officer_ranks` și `officer_promotions`

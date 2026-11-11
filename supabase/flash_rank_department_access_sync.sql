@@ -1,5 +1,5 @@
--- FLASH permission correction: assigned rank + instructor departments are authoritative.
--- Run once in Supabase SQL Editor AFTER the existing FLASH migrations.
+-- Kromix permission correction: assigned rank + instructor departments are authoritative.
+-- Run once in Supabase SQL Editor AFTER the existing Kromix migrations.
 
 -- Resolve instructor authorization from either the legacy role OR actual department membership.
 create or replace function public.has_certificate_instructor(cert text)

@@ -1,5 +1,5 @@
--- FLASH member/profile, multiple departments, inventory and RLS repairs.
--- Run AFTER schema.sql and the existing FLASH migrations.
+-- Kromix member/profile, multiple departments, inventory and RLS repairs.
+-- Run AFTER schema.sql and the existing Kromix migrations.
 -- This file deliberately avoids DO blocks and dollar-quoted SQL bodies.
 
 -- Profile appearance fields.

@@ -1,4 +1,4 @@
--- FLASH Police Department Panel - SUPABASE COMPLETELY FRESH SCHEMA
+-- Kromix Police Department Panel - SUPABASE COMPLETELY FRESH SCHEMA
 -- Paste into Supabase SQL Editor only in a NEW/EMPTY project (or after intentionally wiping public schema).
 -- Auth users remain managed by Supabase Auth. This schema does not drop auth.users.
 -- Project code uses anon key + Supabase Auth; keep service_role key server-side only.
@@ -263,7 +263,7 @@ on conflict(name) do nothing;
 
 
 
--- FLASH feature pack: academy, radio codes, processing templates, profile, notifications.
+-- Kromix feature pack: academy, radio codes, processing templates, profile, notifications.
 alter table public.officers add column if not exists call_sign text;
 alter table public.officers add column if not exists avatar_url text;
 
@@ -431,7 +431,7 @@ create policy "attendance update own or management" on public.attendance for upd
  );
 
 
--- FLASH DCCO + certificate systems. Apply after schema.sql and flash_migration.sql.
+-- Kromix DCCO + certificate systems. Apply after schema.sql and flash_migration.sql.
 create table if not exists public.officer_ranks (
  id uuid primary key default gen_random_uuid(),
  officer_id uuid not null references public.officers(id) on delete cascade,
@@ -563,7 +563,7 @@ alter table public.user_roles add constraint user_roles_role_check check(role in
 -- Roles: dcco, dcco_conducere, instructor_radio, instructor_mdt, instructor_hs, instructor_heli.
 
 
--- Additional application fields and seed values used by the FLASH UI.
+-- Additional application fields and seed values used by the Kromix UI.
 alter table public.officers add column if not exists profile_name text;
 alter table public.officers add column if not exists cnp text;
 
@@ -578,7 +578,7 @@ insert into public.departments(name,description) values
  ('DCCO','Direcția de Combatere a Criminalității Organizate')
 on conflict(name) do nothing;
 
--- Rebuild allowed role list with FLASH access roles.
+-- Rebuild allowed role list with Kromix access roles.
 alter table public.user_roles drop constraint if exists user_roles_role_check;
 alter table public.user_roles add constraint user_roles_role_check check(role in
  ('super_admin','commander','hr','officer','dcco','dcco_conducere',
@@ -635,7 +635,7 @@ end $flash$;
 -- insert into public.user_roles(user_id,role) values ('YOUR_AUTH_UUID','super_admin')
 -- on conflict(user_id) do update set role=excluded.role;
 
--- FLASH: cereri concediu/invoire si certificari pentru instructori
+-- Kromix: cereri concediu/invoire si certificari pentru instructori
 create table if not exists public.absence_requests (
  id uuid primary key default gen_random_uuid(),
  officer_id uuid not null references public.officers(id) on delete cascade,

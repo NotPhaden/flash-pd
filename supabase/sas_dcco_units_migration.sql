@@ -1,5 +1,5 @@
--- FLASH: SAS + DCCO unit workspace, documentation and membership
--- Apply AFTER schema.sql and the existing FLASH migrations.
+-- Kromix: SAS + DCCO unit workspace, documentation and membership
+-- Apply AFTER schema.sql and the existing Kromix migrations.
 
 -- Add the SAS membership and leadership access roles.
 alter table public.user_roles drop constraint if exists user_roles_role_check;

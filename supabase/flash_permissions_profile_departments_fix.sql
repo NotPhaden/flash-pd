@@ -1,5 +1,5 @@
--- FLASH: corectare acces pe baza gradului/departamentului + departamente de conducere
--- Rulează după migrările FLASH anterioare. Nu șterge date.
+-- Kromix: corectare acces pe baza gradului/departamentului + departamente de conducere
+-- Rulează după migrările Kromix anterioare. Nu șterge date.
 
 -- Departamente folosite de interfață. Numele sunt păstrate consecvent.
 insert into public.departments(name, description) values

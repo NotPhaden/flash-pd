@@ -1,6 +1,6 @@
--- FLASH RP: core repairs for career actions, instructor departments,
+-- Kromix RP: core repairs for career actions, instructor departments,
 -- certificate authorization and instructor case boards.
--- Run after the existing FLASH migrations. Review against production first.
+-- Run after the existing Kromix migrations. Review against production first.
 
 -- 1) UP/DOWN: lock only the officers row, never the nullable side of a LEFT JOIN.
 create or replace function public.manage_officer_career(

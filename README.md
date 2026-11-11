@@ -1,4 +1,4 @@
-# FLASH Police Department Panel
+# Kromix Police Department Panel
 
 Proiect Next.js existent, cu interfața și funcționalitățile originale păstrate. Modificările acestei livrări se concentrează pe sincronizarea Supabase/Auth/Realtime și pe o procedură de migrare nedistructivă.
 

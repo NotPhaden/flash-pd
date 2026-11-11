@@ -1,4 +1,4 @@
--- FLASH: conducerea SAS/DCCO doar ca departament + moderare Policegram.
+-- Kromix: conducerea SAS/DCCO doar ca departament + moderare Policegram.
 -- Rulează în Supabase SQL Editor după migrațiile Policegram și profile/departments.
 
 -- 1) Mută încadrarea de conducere din Grade în Departamente, păstrând membrii.

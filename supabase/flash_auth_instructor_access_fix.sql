@@ -1,5 +1,5 @@
--- FLASH RP: repair signup provisioning and instructor/Academy access.
--- Run once in Supabase SQL Editor after the existing FLASH migrations.
+-- Kromix RP: repair signup provisioning and instructor/Academy access.
+-- Run once in Supabase SQL Editor after the existing Kromix migrations.
 -- Does not delete existing Auth users or personnel records.
 
 -- New registrations are Visitors until management assigns a rank/department.
@@ -29,7 +29,7 @@ declare
   v_internal text;
 begin
   if v_character_id = '' or v_first = '' or v_last = '' or v_phone = '' then
-    raise exception 'FLASH RP: completează numele, prenumele, ID-ul personajului și telefonul.';
+    raise exception 'Kromix RP: completează numele, prenumele, ID-ul personajului și telefonul.';
   end if;
 
   -- character_id remains the unique RP identity; the app now maps it to a

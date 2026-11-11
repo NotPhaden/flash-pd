@@ -1,4 +1,4 @@
--- FLASH functional fixes — run AFTER schema.sql, rp_accounts_migration.sql and flash_corrective_migration.sql.
+-- Kromix functional fixes — run AFTER schema.sql, rp_accounts_migration.sql and flash_corrective_migration.sql.
 -- This migration is idempotent. It does not delete user accounts or personal records.
 
 -- Rank-based authority: Subcomisar (level 8) and above.

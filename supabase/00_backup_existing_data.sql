@@ -1,4 +1,4 @@
--- FLASH RP: logical row backup before database reconciliation.
+-- Kromix RP: logical row backup before database reconciliation.
 -- Run once in Supabase SQL Editor. This copies every public BASE TABLE into a
 -- dated private schema. It does not replace a provider-level pg_dump backup:
 -- functions, grants, RLS policies, triggers, auth.users and Storage objects

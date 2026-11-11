@@ -1,4 +1,4 @@
-# FLASH RP – corecții permisiuni, SAS și profil
+# Kromix RP – corecții permisiuni, SAS și profil
 
 ## Ce s-a schimbat
 - Rolurile DCCO/SAS de conducere sunt deduse și din gradul din `officers -> ranks`, nu exclusiv din `user_roles`.

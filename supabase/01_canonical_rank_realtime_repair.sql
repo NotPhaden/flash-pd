@@ -1,4 +1,4 @@
--- FLASH RP canonical synchronization repair (additive / non-destructive).
+-- Kromix RP canonical synchronization repair (additive / non-destructive).
 -- Apply only after 00_backup_existing_data.sql and after exporting a full
 -- Supabase backup (schema + data + auth settings + Storage policies).
 -- Canonical current rank: public.officers.rank_id -> public.ranks.id.

@@ -1,5 +1,5 @@
--- FLASH profile, actions, notification and leave-request improvements
--- Apply AFTER schema.sql and all previously supplied FLASH migrations.
+-- Kromix profile, actions, notification and leave-request improvements
+-- Apply AFTER schema.sql and all previously supplied Kromix migrations.
 
 -- Department directory: ensure the units shown in the UI exist in the database.
 insert into public.departments(name, description) values
@@ -152,7 +152,7 @@ declare
  v_phone text := trim(coalesce(new.raw_user_meta_data->>'rp_phone',''));
 begin
  if v_character_id='' or v_first='' or v_last='' or v_phone='' then
-  raise exception 'FLASH RP registration metadata is incomplete';
+  raise exception 'Kromix RP registration metadata is incomplete';
  end if;
  insert into public.rp_accounts(user_id,character_id,rp_first_name,rp_last_name,rp_phone)
  values(new.id,v_character_id,v_first,v_last,v_phone)

@@ -1,4 +1,4 @@
--- FLASH: repararea finală a accesului SAS/DCCO și modulul Policegram.
+-- Kromix: repararea finală a accesului SAS/DCCO și modulul Policegram.
 -- Rulează o singură dată în Supabase SQL Editor, după migrațiile existente.
 
 -- Rolurile SAS/DCCO sunt valide în user_roles și pot fi atribuite explicit.

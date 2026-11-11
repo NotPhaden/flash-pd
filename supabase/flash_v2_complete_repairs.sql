@@ -1,6 +1,6 @@
--- FLASH v2: fixes for profile storage, Visitor access, instructor certificates,
+-- Kromix v2: fixes for profile storage, Visitor access, instructor certificates,
 -- department membership, career dates and UP/DOWN history.
--- Run AFTER the existing schema and all FLASH migrations.
+-- Run AFTER the existing schema and all Kromix migrations.
 
 -- 1) New accounts start as Visitor, not as an operational officer.
 alter table public.user_roles alter column role set default 'visitor';

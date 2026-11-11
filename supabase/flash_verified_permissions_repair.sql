@@ -1,4 +1,4 @@
--- FLASH verified permission and profile repair.
+-- Kromix verified permission and profile repair.
 -- Run AFTER flash_final_permissions_departments_profile.sql.
 -- This migration intentionally contains no DO blocks or publication changes.
 

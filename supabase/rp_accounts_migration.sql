@@ -1,4 +1,4 @@
--- FLASH RP identity + account provisioning. Run AFTER schema.sql.
+-- Kromix RP identity + account provisioning. Run AFTER schema.sql.
 -- Supabase Auth uses a reserved synthetic address; no real email is collected.
 create table if not exists public.rp_accounts (
   user_id uuid primary key references auth.users(id) on delete cascade,
@@ -31,7 +31,7 @@ begin
   v_last := trim(coalesce(new.raw_user_meta_data->>'rp_last_name',''));
   v_phone := trim(coalesce(new.raw_user_meta_data->>'rp_phone',''));
   if v_character_id = '' or v_first = '' or v_last = '' or v_phone = '' then
-    raise exception 'FLASH RP registration metadata is incomplete';
+    raise exception 'Kromix RP registration metadata is incomplete';
   end if;
   insert into public.rp_accounts(user_id, character_id, rp_first_name, rp_last_name, rp_phone)
   values(new.id, v_character_id, v_first, v_last, v_phone);

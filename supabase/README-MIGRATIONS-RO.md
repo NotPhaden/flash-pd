@@ -1,4 +1,4 @@
-# Supabase – procedură de migrare controlată (FLASH RP)
+# Supabase – procedură de migrare controlată (Kromix RP)
 
 ## Model canonic
 
@@ -15,15 +15,15 @@ Nu transforma automat un grad în rol administrativ. Rolurile administrative/ins
 
 1. Folosește un proiect Supabase staging sau creează un branch/database branch.
 2. Din Supabase Dashboard → Database → Backups creează un backup complet sau folosește `supabase db dump` (schema + data). Exportă separat setările Auth, utilizatorii/identitățile dacă este necesar și Storage.
-3. În SQL Editor rulează `00_backup_existing_data.sql`. Acesta creează o copie logică a tabelelor din `public` în schema `flash_backup_20261109`. Este o plasă de siguranță pentru rânduri, NU înlocuiește backup-ul complet: nu copiază funcții, politici, trigger-e, setări Auth sau obiecte Storage.
+3. În SQL Editor rulează `00_backup_existing_data.sql`. Acesta creează o copie logică a tabelelor din `public` în schema `Kromix_backup_20261109`. Este o plasă de siguranță pentru rânduri, NU înlocuiește backup-ul complet: nu copiază funcții, politici, trigger-e, setări Auth sau obiecte Storage.
 4. Rulează interogările de diagnostic din `01_canonical_rank_realtime_repair.sql` pe staging mai întâi și verifică duplicatele `officers.user_id`.
 
-## Aplicare pentru o instalare FLASH deja existentă
+## Aplicare pentru o instalare Kromix deja existentă
 
 Migrările istorice din `supabase/` nu sunt un lanț automat sigur: unele se suprapun și înlocuiesc aceleași funcții/politici. Nu le executa pe toate din nou.
 
 1. Compară migrările deja aplicate în Supabase → Database → Migrations (sau istoricul CLI) cu fișierele din arhivă.
-2. Dacă lipsesc obiecte necesare frontend-ului, aplică numai migrările lipsă, în ordinea cerută de README-ul corespunzător. Pentru pachetul complet FLASH, documentația istorică a indicat: `rp_accounts_migration.sql`, `flash_corrective_migration.sql`, `flash_functional_fixes.sql`, `sas_dcco_units_migration.sql`, `flash_profile_actions_migration.sql`, `flash_member_profile_inventory_fix.sql`, apoi `flash_final_permissions_departments_profile.sql`, `flash_verified_permissions_repair.sql`, `flash_auth_instructor_access_fix.sql`, `flash_rank_department_access_sync.sql`, `flash_v2_complete_repairs.sql` (unele pot fi deja incluse/aplicate; verifică definițiile înainte de execuție).
+2. Dacă lipsesc obiecte necesare frontend-ului, aplică numai migrările lipsă, în ordinea cerută de README-ul corespunzător. Pentru pachetul complet Kromix, documentația istorică a indicat: `rp_accounts_migration.sql`, `Kromix_corrective_migration.sql`, `Kromix_functional_fixes.sql`, `sas_dcco_units_migration.sql`, `Kromix_profile_actions_migration.sql`, `Kromix_member_profile_inventory_fix.sql`, apoi `Kromix_final_permissions_departments_profile.sql`, `Kromix_verified_permissions_repair.sql`, `Kromix_auth_instructor_access_fix.sql`, `Kromix_rank_department_access_sync.sql`, `Kromix_v2_complete_repairs.sql` (unele pot fi deja incluse/aplicate; verifică definițiile înainte de execuție).
 3. După ce tabelele/funcțiile cerute există, rulează `01_canonical_rank_realtime_repair.sql`.
 4. RPC-ul `save_officer_record_with_career` este folosit de interfață pentru a salva\n   într-o singură tranzacție datele personale, gradul, departamentele și istoricul.\n   Verifică manual rezultatul pentru fiecare cont și grad; nu șterge `officer_ranks`, `officer_promotions` sau `user_roles`.
 
@@ -39,7 +39,7 @@ Rulează query-urile de la finalul `01_canonical_rank_realtime_repair.sql` și v
 - modificarea `ranks.name`/`ranks.level` actualizează eticheta/nivelul în dashboard;
 - modificările `user_roles` reîncarcă permisiunile contului;
 - un utilizator obișnuit nu poate acorda singur grade/roluri prin RPC sau API;
-- conturile nou create primesc rolul inițial `visitor` conform versiunii finale a funcției `provision_flash_rp_account`;
+- conturile nou create primesc rolul inițial `visitor` conform versiunii finale a funcției `provision_Kromix_rp_account`;
 - RLS pentru toate tabelele operaționale și Storage este verificat separat.
 
 ## Configurarea aplicației
@@ -62,7 +62,7 @@ Nu trimite parola contului personal, cheia `service_role`, token-uri JWT sau dat
 
 ## Policegram și repararea finală a accesului SAS/DCCO
 
-După migrațiile FLASH deja aplicate, rulează `policegram_and_final_access_fix.sql` în Supabase SQL Editor. Migrarea:
+După migrațiile Kromix deja aplicate, rulează `policegram_and_final_access_fix.sql` în Supabase SQL Editor. Migrarea:
 - repară funcțiile de acces pentru SAS și DCCO pe baza rolului, gradului și tuturor departamentelor asociate;
 - permite conducerii SAS/DCCO să administreze documentele unității proprii și să consulte rosterul corect;
 - creează tabelele Policegram pentru postări, comentarii și aprecieri;

@@ -1,4 +1,4 @@
-# FLASH RP – corecție autentificare și acces
+# Kromix RP – corecție autentificare și acces
 
 Această actualizare repară înregistrarea conturilor noi și accesul la pagina Instructori.
 

@@ -1,16 +1,16 @@
-# FLASH Police Panel – corecții v2
+# Kromix Police Panel – corecții v2
 
 Această versiune include corecții pentru încărcarea avatarului/fundalului, grade distincte de instructor, certificatele Radio/MDT/Heli/Moto/HS, accesul DCCO/SAS, statisticile acțiunilor, conturile Vizitator și istoricul UP/DOWN.
 
 ## Pași obligatorii pentru Supabase
 
 1. Fă backup bazei de date.
-2. Verifică faptul că migrările FLASH anterioare sunt deja aplicate (inclusiv `flash_final_permissions_departments_profile.sql`, `flash_verified_permissions_repair.sql`, `flash_profile_actions_migration.sql` și `sas_dcco_units_migration.sql`).
+2. Verifică faptul că migrările Kromix anterioare sunt deja aplicate (inclusiv `flash_final_permissions_departments_profile.sql`, `flash_verified_permissions_repair.sql`, `flash_profile_actions_migration.sql` și `sas_dcco_units_migration.sql`).
 3. În Supabase → SQL Editor, rulează **o singură dată**, la final, `supabase/flash_v2_complete_repairs.sql`.
 4. Verifică în Storage că există bucket-ul public `avatars` și că upload-ul se face în folderul cu UUID-ul utilizatorului.
 5. Publică aplicația cu variabilele `NEXT_PUBLIC_SUPABASE_URL` și `NEXT_PUBLIC_SUPABASE_ANON_KEY` din proiectul tău.
 
-Nu rula `schema.sql` peste o bază de date existentă. Migrarea v2 este incrementală și trebuie aplicată după migrările FLASH anterioare.
+Nu rula `schema.sql` peste o bază de date existentă. Migrarea v2 este incrementală și trebuie aplicată după migrările Kromix anterioare.
 
 ## Teste recomandate după migrare
 

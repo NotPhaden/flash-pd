@@ -1,4 +1,4 @@
-# FLASH RP – corecție permisiuni pe grad, departamente și sincronizare avatar
+# Kromix RP – corecție permisiuni pe grad, departamente și sincronizare avatar
 
 ## Ce rezolvă
 - Un membru cu grad atribuit (Agent sau mai mare) nu mai rămâne blocat ca `visitor` doar pentru că în `user_roles` a rămas rolul inițial `visitor`.
@@ -11,7 +11,7 @@
 
 ## Instalare
 1. Fă backup bazei Supabase.
-2. Rulează `supabase/flash_rank_department_access_sync.sql` în Supabase SQL Editor, după migrările FLASH existente.
+2. Rulează `supabase/flash_rank_department_access_sync.sql` în Supabase SQL Editor, după migrările Kromix existente.
 3. Înlocuiește codul aplicației cu această arhivă și păstrează variabilele de mediu ale proiectului în `.env` (nu copia `.env` din arhivă).
 4. Publică aplicația și reconectează utilizatorii / reîncarcă sesiunea după ce le schimbi gradul sau departamentele.
 

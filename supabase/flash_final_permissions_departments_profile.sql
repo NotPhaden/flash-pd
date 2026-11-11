@@ -1,6 +1,6 @@
--- FLASH final corrections: appearance save, department deduplication,
+-- Kromix final corrections: appearance save, department deduplication,
 -- top-command permissions, deletions and certificate applications.
--- Run AFTER all previously supplied FLASH migrations.
+-- Run AFTER all previously supplied Kromix migrations.
 
 -- 1) Rank-based permission helpers. Rank 12 = Chestor general, 13 = Chestor secundar.
 create or replace function public.current_officer_rank_level()
